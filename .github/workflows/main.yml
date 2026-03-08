@@ -9,11 +9,13 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
+          sudo dpkg --add-architecture armhf
           sudo add-apt-repository ppa:deadsnakes/ppa -y
           sudo apt-get update
           sudo apt-get install -y \
             gcc-arm-linux-gnueabi \
             python3.13 python3.13-dev \
+            libffi-dev:armhf \
             make wget
 
       - name: Download Python 3.13 source
@@ -40,6 +42,7 @@ jobs:
             --enable-shared \
             --without-ensurepip \
             --disable-ipv6 \
+            --with-system-ffi \
             --prefix=$HOME/python32_out
           make -j4
           make install
