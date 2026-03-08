@@ -1,4 +1,4 @@
-name: Build libpython3.11 ARMv7
+name: Build libpython3.13 ARMv7
 
 on:
   workflow_dispatch:
@@ -12,13 +12,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             gcc-arm-linux-gnueabi \
-            python3.11 python3.11-dev \
+            python3.13 python3.13-dev \
             make wget
 
-      - name: Download Python 3.11 source
+      - name: Download Python 3.13 source
         run: |
-          wget https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tgz
-          tar xf Python-3.11.9.tgz
+          wget https://www.python.org/ftp/python/3.13.0/Python-3.13.0.tgz
+          tar xf Python-3.13.0.tgz
 
       - name: Create CONFIG_SITE
         run: |
@@ -28,13 +28,13 @@ jobs:
           ac_cv_have_long_long_format=yes
           EOF
 
-      - name: Cross-compile libpython3.11 for ARMv7
+      - name: Cross-compile libpython3.13 for ARMv7
         run: |
-          cd Python-3.11.9
+          cd Python-3.13.0
           CONFIG_SITE=$HOME/config.site ./configure \
             --host=arm-linux-gnueabi \
             --build=x86_64-linux-gnu \
-            --with-build-python=$(which python3.11) \
+            --with-build-python=$(which python3.13) \
             CC=arm-linux-gnueabi-gcc \
             --enable-shared \
             --without-ensurepip \
@@ -46,5 +46,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: libpython3.11-armeabi-v7a
-          path: ~/python32_out/lib/libpython3.11*.so*
+          name: libpython3.13-armeabi-v7a
+          path: ~/python32_out/lib/libpython3.13*.so*
