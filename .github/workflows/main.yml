@@ -1,0 +1,42 @@
+name: Build libpython3.11 ARMv7
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gcc-arm-linux-gnueabi \
+            python3.11 python3.11-dev \
+            make wget
+
+      - name: Download Python 3.11 source
+        run: |
+          wget https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tgz
+          tar xf Python-3.11.9.tgz
+
+      - name: Cross-compile libpython3.11 for ARMv7
+        run: |
+          cd Python-3.11.9
+          ./configure \
+            --host=arm-linux-gnueabi \
+            --build=x86_64-linux-gnu \
+            --with-build-python=$(which python3.11) \
+            CC=arm-linux-gnueabi-gcc \
+            --enable-shared \
+            --without-ensurepip \
+            --disable-ipv6 \
+            --prefix=$HOME/python32_out
+          make -j4
+          make install
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libpython3.11-armeabi-v7a
+          path: ~/python32_out/lib/libpython3.11*.so*
