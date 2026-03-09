@@ -15,7 +15,8 @@ jobs:
           sudo apt-get install -y \
             gcc-arm-linux-gnueabi \
             python3.13 python3.13-dev \
-            make wget autoconf libtool pkg-config
+            make wget autoconf libtool pkg-config \
+            zlib1g-dev
 
       - name: Build libffi for ARMv7
         run: |
@@ -25,8 +26,19 @@ jobs:
           ./configure \
             --host=arm-linux-gnueabi \
             --build=x86_64-linux-gnu \
-            --prefix=$HOME/libffi_arm \
+            --prefix=$HOME/sysroot_arm \
             CC=arm-linux-gnueabi-gcc
+          make -j4
+          make install
+
+      - name: Build zlib for ARMv7
+        run: |
+          wget https://zlib.net/zlib-1.3.1.tar.gz
+          tar xf zlib-1.3.1.tar.gz
+          cd zlib-1.3.1
+          CC=arm-linux-gnueabi-gcc ./configure \
+            --prefix=$HOME/sysroot_arm \
+            --static
           make -j4
           make install
 
@@ -56,8 +68,8 @@ jobs:
             --disable-ipv6 \
             --with-system-ffi \
             --prefix=$HOME/python32_out \
-            CFLAGS="-I$HOME/libffi_arm/include" \
-            LDFLAGS="-L$HOME/libffi_arm/lib"
+            CFLAGS="-I$HOME/sysroot_arm/include" \
+            LDFLAGS="-L$HOME/sysroot_arm/lib"
           make -j4
           make install
 
